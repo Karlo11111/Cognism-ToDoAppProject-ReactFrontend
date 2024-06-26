@@ -1,0 +1,43 @@
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.todo-checkbox {
+  margin-right: 10px;
+  align-self: center;
+  size: 3rem;
+}
+.todo-edit{
+  margin-right: 5rem;
+  align-self: center;
+}
+.todo-delete{
+  margin-right: 5rem;
+  align-self: center;
+}
+.todo-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.todo-main {
+  flex: 1;
+  margin-left: 3rem;
+}
+
+.todo-details {
+  flex: 1;
+}
