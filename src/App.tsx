@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
-import Select, { ActionMeta, SingleValue } from "react-select";
+import Select from "react-select";
 import { TodoList } from "./Components/specific/TodoList";
 import Modal from "./Components/common/Modal";
 import CreateTodo from "./Components/specific/CreateToDo";
 import CreateLabelForm from "./Components/specific/CreateLabelForm";
-import { getLabels, createLabel, deleteLabel } from "./Services/Api/ToDo";
+import { getLabels, createLabel, deleteLabel, sortByReminder } from "./Services/Api/ToDo";
 import { Label } from "./Interfaces/todo.interface";
+import SortedTodoList from "./Components/specific/SortedTodoList"; // Import SortedTodoList component
 
 const App: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [labels, setLabels] = useState<Label[]>([]);
   const [filterLabel, setFilterLabel] = useState<string>("");
   const [isLabelModalOpen, setIsLabelModalOpen] = useState<boolean>(false);
+  const [showSortedTodos, setShowSortedTodos] = useState<boolean>(false); // State to toggle between TodoList and SortedTodoList
+  const [upcomingClicked, setUpcomingClicked] = useState<boolean>(false); // State to track if "Upcoming" button is clicked
 
   useEffect(() => {
     getLabels().then((response) => {
@@ -22,13 +25,7 @@ const App: React.FC = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  type OptionType = { label: string | JSX.Element; value: string };
-
-  // Update handleLabelChange to match the expected signature
-  const handleLabelChange = (
-    newValue: OptionType | null,
-    actionMeta: ActionMeta<OptionType>
-  ) => {
+  const handleLabelChange = (newValue: any) => {
     if (newValue?.value === "new") {
       setIsLabelModalOpen(true);
     } else {
@@ -74,7 +71,6 @@ const App: React.FC = () => {
     { value: "new", label: "Create New Label" },
   ];
 
-  // Custom styles for react-select
   const customStyles = {
     control: (provided: any) => ({
       ...provided,
@@ -116,7 +112,23 @@ const App: React.FC = () => {
 
   const buttonAndSelectStyles = {
     display: "flex",
-    width: "50rem",
+    width: "70rem",
+  };
+
+  const upcomingButtonStyles = {
+    height: "40px",
+    marginLeft: "2rem",
+    backgroundColor: upcomingClicked ? "#4CAF50" : "transparent", // Change background color if upcomingClicked is true
+    color: upcomingClicked ? "white" : "black", 
+    border: "1px solid #ccc",
+    borderRadius: "4px",
+    padding: "0 1rem",
+    cursor: "pointer",
+  };
+
+  const handleUpcomingClick = () => {
+    setUpcomingClicked(!upcomingClicked); // Toggle upcomingClicked state
+    setShowSortedTodos(!showSortedTodos); // Toggle showSortedTodos state
   };
 
   return (
@@ -124,29 +136,28 @@ const App: React.FC = () => {
       <header className="App-header">
         <h1>TODO List</h1>
         <div style={buttonAndSelectStyles}>
-          <button
-            className="plus-button"
-            onClick={openModal}
-            style={buttonStyles}
-          >
+          <button className="plus-button" onClick={openModal} style={buttonStyles}>
             +
           </button>
           <Select
             styles={customStyles}
-            value={labelOptions.find((option) => option.value === filterLabel)}
             onChange={handleLabelChange}
             options={labelOptions}
           />
+          <button className="upcoming-button" style={upcomingButtonStyles} onClick={handleUpcomingClick}>
+            Upcoming
+          </button>
         </div>
       </header>
-      <TodoList filterLabel={filterLabel} />
+      {showSortedTodos ? (
+        <SortedTodoList onClose={() => setShowSortedTodos(false)} />
+      ) : (
+        <TodoList filterLabel={filterLabel} />
+      )}
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <CreateTodo onClose={closeModal} labels={labels} />
       </Modal>
-      <Modal
-        isOpen={isLabelModalOpen}
-        onClose={() => setIsLabelModalOpen(false)}
-      >
+      <Modal isOpen={isLabelModalOpen} onClose={() => setIsLabelModalOpen(false)}>
         <CreateLabelForm onSubmit={createNewLabel} />
       </Modal>
     </div>

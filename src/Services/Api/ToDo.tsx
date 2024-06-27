@@ -2,6 +2,7 @@ import axios from "axios";
 
 const API_URL = "http://localhost:3333/api/todos";
 const LABELS_API_URL = "http://localhost:3333/api/labels";
+const REMINDERS_API_URL = "http://localhost:3333/api/todos/reminders";
 
 export const getTodos = async () => {
   return await axios.get(API_URL);
@@ -34,3 +35,7 @@ export const createLabel = async (label: any) => {
 export const deleteLabel = async (id: string) => {
   return await axios.delete(`${LABELS_API_URL}/${id}`);
 };
+
+export const sortByReminder = async () => {
+  return await axios.get(REMINDERS_API_URL);
+}
